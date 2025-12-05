@@ -20,13 +20,13 @@ export default function Home() {
         setPrinters(data.printers || []);
         if (data.printers && data.printers[0]) setPrinter(data.printers[0]);
       })
-      .catch((e) => setLog("Failed to load printers: " + e.message));
+      .catch((e) => setLog("Fehler beim laden der Drucker: " + e.message));
   }, []);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!file) return setLog("Please choose a PDF file");
-    if (!printer) return setLog("Please select a printer");
+    if (!file) return setLog("Bitte wähle eine PDF Datei");
+    if (!printer) return setLog("Bitte wähle einen Drucker");
 
     const fd = new FormData();
     fd.append("file", file);
@@ -37,14 +37,14 @@ export default function Home() {
     fd.append("format", format);
 
     setSending(true);
-    setLog("Sending...");
+    setLog("Senden...");
     try {
       const res = await fetch("/api/print", { method: "POST", body: fd });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || JSON.stringify(json));
-      setLog("Print job sent. Job id: " + json.jobId);
+      setLog("Druckauftrag gesendet. Job id: " + json.jobId);
     } catch (err: any) {
-      setLog("Error: " + err.message);
+      setLog("Fehler: " + err.message);
     } finally {
       setSending(false);
     }
@@ -60,7 +60,7 @@ export default function Home() {
         <form onSubmit={onSubmit} className="space-y-5">
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Upload PDF
+              PDF hochladen
             </label>
             <input
               accept="application/pdf"
@@ -77,7 +77,7 @@ export default function Home() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Printer
+              Drucker
             </label>
             <select
               value={printer}
@@ -112,15 +112,15 @@ export default function Home() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Color Mode
+                Farbmodus
               </label>
               <select
                 value={color}
                 onChange={(e) => setColor(e.target.value)}
                 className="mt-2 w-full p-2 border text-gray-700 border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500"
               >
-                <option value="color">Color</option>
-                <option value="grayscale">Grayscale</option>
+                <option value="color">Farbe</option>
+                <option value="grayscale">Graustufen</option>
               </select>
             </div>
           </div>
@@ -128,7 +128,7 @@ export default function Home() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700">
-                Copies
+                Kopien
               </label>
               <input
                 type="number"
@@ -159,7 +159,7 @@ export default function Home() {
             disabled={sending}
             className="w-full py-2.5 text-white bg-teal-500 hover:bg-teal-600 rounded-lg font-medium disabled:opacity-60 transition"
           >
-            {sending ? "Sending…" : "Send to Printer"}
+            {sending ? "Sendet…" : "An Drucker senden"}
           </button>
         </form>
 
