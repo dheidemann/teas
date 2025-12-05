@@ -9,7 +9,7 @@ export default function Home() {
   const [duplex, setDuplex] = useState("two-sided-long-edge");
   const [color, setColor] = useState("grayscale");
   const [copies, setCopies] = useState(1);
-  const [format, setFormat] = useState("A4");
+  const [format, setFormat] = useState("a4");
   const [sending, setSending] = useState(false);
   const [log, setLog] = useState("");
 
@@ -149,8 +149,8 @@ export default function Home() {
                 onChange={(e) => setFormat(e.target.value)}
                 className="mt-2 w-full p-2 border text-gray-700 border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500"
               >
-                <option value="A4">A4</option>
-                <option value="A3">A3</option>
+                <option value="a4">A4</option>
+                <option value="a3">A3</option>
               </select>
             </div>
           </div>

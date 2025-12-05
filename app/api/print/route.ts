@@ -42,7 +42,7 @@ export async function POST(req: Request) {
         "-o",
         color === "grayscale" ? "ColorModel=Gray" : "ColorModel=Color"
       );
-    if (format) args.push("-o", "media=", format);
+    if (format) args.push("-o", `media=${format}`);
     args.push(tempFilePath);
 
     const cmd = `lp ${args.map((a) => `"${a}"`).join(" ")}`;
