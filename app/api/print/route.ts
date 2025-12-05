@@ -18,6 +18,7 @@ export async function POST(req: Request) {
     const duplex = formData.get("duplex") as string | null;
     const color = formData.get("color") as string | null;
     const copies = formData.get("copies") as string | null;
+    const format = formData.get("format") as string | null;
 
     if (!file)
       return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
@@ -41,6 +42,7 @@ export async function POST(req: Request) {
         "-o",
         color === "grayscale" ? "ColorModel=Gray" : "ColorModel=Color"
       );
+    if (format) args.push("-o", "media=", format);
     args.push(tempFilePath);
 
     const cmd = `lp ${args.map((a) => `"${a}"`).join(" ")}`;

@@ -6,9 +6,10 @@ export default function Home() {
   const [printers, setPrinters] = useState<string[]>([]);
   const [file, setFile] = useState<File | null>(null);
   const [printer, setPrinter] = useState("");
-  const [duplex, setDuplex] = useState("one-sided");
-  const [color, setColor] = useState("color");
+  const [duplex, setDuplex] = useState("two-sided-long-edge");
+  const [color, setColor] = useState("grayscale");
   const [copies, setCopies] = useState(1);
+  const [format, setFormat] = useState("A4");
   const [sending, setSending] = useState(false);
   const [log, setLog] = useState("");
 
@@ -33,6 +34,7 @@ export default function Home() {
     fd.append("duplex", duplex);
     fd.append("color", color);
     fd.append("copies", String(copies));
+    fd.append("format", format);
 
     setSending(true);
     setLog("Sending...");
@@ -52,7 +54,7 @@ export default function Home() {
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
       <div className="w-full max-w-xl bg-white shadow-lg rounded-xl p-8 border border-gray-200">
         <h1 className="text-3xl font-bold mb-6 text-gray-800 text-center">
-        Fachschaftsdruckerservice
+          Druckerservice
         </h1>
 
         <form onSubmit={onSubmit} className="space-y-5">
@@ -123,23 +125,39 @@ export default function Home() {
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Copies
-            </label>
-            <input
-              type="number"
-              min={1}
-              max={20}
-              value={copies}
-              onChange={(e) => setCopies(Number(e.target.value))}
-              className="mt-2 w-28 p-2 border text-gray-700 border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500"
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Copies
+              </label>
+              <input
+                type="number"
+                min={1}
+                max={20}
+                value={copies}
+                onChange={(e) => setCopies(Number(e.target.value))}
+                className="mt-2 p-[5px] border text-gray-700 border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 w-full"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Format
+              </label>
+              <select
+                value={format}
+                onChange={(e) => setFormat(e.target.value)}
+                className="mt-2 w-full p-2 border text-gray-700 border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="A4">A4</option>
+                <option value="A3">A3</option>
+              </select>
+            </div>
           </div>
 
           <button
             disabled={sending}
-            className="w-full py-2.5 text-white bg-blue-600 hover:bg-blue-700 rounded-lg font-medium disabled:opacity-60 transition"
+            className="w-full py-2.5 text-white bg-teal-500 hover:bg-teal-600 rounded-lg font-medium disabled:opacity-60 transition"
           >
             {sending ? "Sending…" : "Send to Printer"}
           </button>
