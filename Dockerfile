@@ -11,7 +11,7 @@ RUN apt-get update && \
       cups \
       cups-client \
       cups-bsd \
-      ghostscript \
+      poppler-utils \
       libcups2 \
       ca-certificates \
       && rm -rf /var/lib/apt/lists/*

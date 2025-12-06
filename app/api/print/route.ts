@@ -5,10 +5,23 @@ import fs from "fs/promises";
 import path from "path";
 import os from "os";
 import crypto from "crypto";
+import { recordPrintEvent } from "@/lib/recordPrint";
+import { headers } from "next/headers";
 
 const execFile = promisify(execFileCb);
 
 export const runtime = "nodejs";
+async function getPdfPages(filePath: string): Promise<number | undefined> {
+  try {
+    const { stdout } = await execFile("pdfinfo", [filePath], {
+      timeout: CHILD_TIMEOUT_MS,
+    });
+    const m = String(stdout).match(/^Pages:\s+(\d+)/im);
+    return m ? parseInt(m[1], 10) : undefined;
+  } catch {
+    return undefined;
+  }
+}
 
 const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
 const CHILD_TIMEOUT_MS = 30_000;
@@ -21,6 +34,7 @@ const ALLOWED_COLOR = new Set(["color", "grayscale"]);
 const MAX_COPIES = 100;
 const PRINTER_NAME_RE = /^[a-zA-Z0-9._-]{1,100}$/;
 const FORMAT_RE = /^[a-zA-Z0-9._-]{1,100}$/;
+const MAX_PAGES = 30;
 
 function safeExtFromFilename(filename: string) {
   const ext = path.extname(filename || "").toLowerCase();
@@ -29,6 +43,9 @@ function safeExtFromFilename(filename: string) {
 }
 
 export async function POST(req: Request) {
+  const headersList = await headers();
+  const username = headersList.get("Remote-User");
+
   let tempDir = "";
   let tempFilePath = "";
 
@@ -146,6 +163,17 @@ export async function POST(req: Request) {
     }
     await fs.writeFile(tempFilePath, buf, { mode: 0o600 });
 
+    const pages = await getPdfPages(tempFilePath);
+    if (safeExt === ".pdf") {
+      if (typeof pages === "number" && pages > MAX_PAGES) {
+        await fs.rm(tempDir, { recursive: true, force: true }).catch(() => {});
+        return NextResponse.json(
+          { error: `File has too many pages (max ${MAX_PAGES})` },
+          { status: 413 }
+        );
+      }
+    }
+
     const args: string[] = [];
     args.push("-d", printer);
     if (typeof copies === "number") args.push("-n", String(copies));
@@ -189,6 +217,13 @@ export async function POST(req: Request) {
       stdout.match(/(\d+) (?:job|request)/i);
     const jobId = jobIdMatch ? jobIdMatch[1] : undefined;
 
+    recordPrintEvent({
+      username: username ?? "",
+      pages: pages ?? 1,
+      jobid: jobId ?? "",
+      success: true,
+    });
+
     return NextResponse.json({
       jobId,
       raw: stdout ? stdout.trim() : undefined,
@@ -197,6 +232,14 @@ export async function POST(req: Request) {
     if (tempDir) {
       await fs.rm(tempDir, { recursive: true, force: true }).catch(() => {});
     }
+
+    recordPrintEvent({
+      username: username ?? "",
+      pages: 0,
+      jobid: "",
+      success: false,
+    });
+
     const msg = err?.message ?? String(err);
     return NextResponse.json(
       { error: "Failed to print: " + msg },
