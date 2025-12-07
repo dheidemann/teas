@@ -9,12 +9,12 @@ export function recordPrintEvent({
   username,
   pages,
   jobid,
-  success = true,
+  success,
 }: {
   username: string;
   pages: number;
   jobid: string;
-  success?: boolean;
+  success: boolean;
 }) {
   pagesPrintedTotal.labels(username, jobid).inc(pages);
   pagesLastPrintTimestamp.labels(username, jobid).set(new Date().getTime());

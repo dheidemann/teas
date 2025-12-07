@@ -27,3 +27,18 @@ services:
     environment:
       CUPS_SERVER: <your cups server>
 ```
+
+### Env vars
+| Key | Description | Example |
+| - | - | - |
+| `EXPORT_METRICS` | Enables the `/api/metrics` endpoint. | `true` |
+
+## Metrics
+When enabled, `teas` exposes metrics regarding the printing activity. To label them by username or similar identifier, the API awaits a `Remote-User` header.
+
+| Name | Type | Description | Labels |
+| - | - | - | - |
+| `pages_printed_total` | Counter | Total number of pages printed by user. | `username`, `jobid` |
+| `pages_last_print_timestamp_seconds` | Gauge | Unix timestamp of last print by user. | `username`, `jobid` |
+| `print_jobs_total` | Counter | Total number of print jobs per user and status. |`username`, `jobid`, `status` |
+| `print_job_pages` | Histogram | Distribution of pages per print job. | `username`, `jobid` |

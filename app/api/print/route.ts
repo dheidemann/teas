@@ -8,21 +8,7 @@ import crypto from "crypto";
 import { recordPrintEvent } from "@/lib/recordPrint";
 import { headers } from "next/headers";
 
-const execFile = promisify(execFileCb);
-
-export const runtime = "nodejs";
-async function getPdfPages(filePath: string): Promise<number | undefined> {
-  try {
-    const { stdout } = await execFile("pdfinfo", [filePath], {
-      timeout: CHILD_TIMEOUT_MS,
-    });
-    const m = String(stdout).match(/^Pages:\s+(\d+)/im);
-    return m ? parseInt(m[1], 10) : undefined;
-  } catch {
-    return undefined;
-  }
-}
-
+const EXPORT_METRICS = process.env.EXPORT_METRICS === "true";
 const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
 const CHILD_TIMEOUT_MS = 30_000;
 const ALLOWED_DUPLEX = new Set([
@@ -36,11 +22,8 @@ const PRINTER_NAME_RE = /^[a-zA-Z0-9._-]{1,100}$/;
 const FORMAT_RE = /^[a-zA-Z0-9._-]{1,100}$/;
 const MAX_PAGES = 30;
 
-function safeExtFromFilename(filename: string) {
-  const ext = path.extname(filename || "").toLowerCase();
-  const allowed = new Set([".pdf", ".ps", ".txt", ".png", ".jpg", ".jpeg"]);
-  return allowed.has(ext) ? ext : ".pdf";
-}
+const execFile = promisify(execFileCb);
+export const runtime = "nodejs";
 
 export async function POST(req: Request) {
   const headersList = await headers();
@@ -217,12 +200,20 @@ export async function POST(req: Request) {
       stdout.match(/(\d+) (?:job|request)/i);
     const jobId = jobIdMatch ? jobIdMatch[1] : undefined;
 
-    recordPrintEvent({
-      username: username ?? "",
-      pages: pages ?? 1,
-      jobid: jobId ?? "",
-      success: true,
-    });
+    if (EXPORT_METRICS) {
+      recordPrintEvent({
+        username: username ?? "",
+        pages: (pages ?? 1) * (copies ?? 1),
+        jobid: jobId ?? "",
+        success: true,
+      });
+    }
+
+    console.log(
+      `Received print job. Job-ID: ${jobId}, Pages: ${pages ?? 1}, Copies: ${
+        copies ?? 1
+      }${username ?? `, Username: ${username}`}`
+    );
 
     return NextResponse.json({
       jobId,
@@ -233,12 +224,14 @@ export async function POST(req: Request) {
       await fs.rm(tempDir, { recursive: true, force: true }).catch(() => {});
     }
 
-    recordPrintEvent({
-      username: username ?? "",
-      pages: 0,
-      jobid: "",
-      success: false,
-    });
+    if (EXPORT_METRICS) {
+      recordPrintEvent({
+        username: username ?? "",
+        pages: 0,
+        jobid: "",
+        success: false,
+      });
+    }
 
     const msg = err?.message ?? String(err);
     return NextResponse.json(
@@ -246,4 +239,22 @@ export async function POST(req: Request) {
       { status: 500 }
     );
   }
+}
+
+async function getPdfPages(filePath: string): Promise<number | undefined> {
+  try {
+    const { stdout } = await execFile("pdfinfo", [filePath], {
+      timeout: CHILD_TIMEOUT_MS,
+    });
+    const m = String(stdout).match(/^Pages:\s+(\d+)/im);
+    return m ? parseInt(m[1], 10) : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+function safeExtFromFilename(filename: string) {
+  const ext = path.extname(filename || "").toLowerCase();
+  const allowed = new Set([".pdf", ".ps", ".txt", ".png", ".jpg", ".jpeg"]);
+  return allowed.has(ext) ? ext : ".pdf";
 }
