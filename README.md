@@ -35,7 +35,7 @@ services:
 | | `EXPORT_METRICS` | Enables the `/api/metrics` endpoint. | `true` |
 
 ## Metrics
-When enabled, `teas` exposes metrics regarding the printing activity. To label them by username or similar identifier, the API awaits a `Remote-User` header.
+When enabled, `teas` exposes metrics regarding the printing activity. To label them by username or similar identifier, the API awaits a `Remote-User` header. The project root holds a [Grafana sample dashboard](dashboard.json)
 
 | Name | Type | Description | Labels |
 | - | - | - | - |
