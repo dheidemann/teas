@@ -8,16 +8,14 @@ import {
 export function recordPrintEvent({
   username,
   pages,
-  jobid,
   success,
 }: {
   username: string;
   pages: number;
-  jobid: string;
   success: boolean;
 }) {
-  pagesPrintedTotal.labels(username, jobid).inc(pages);
-  pagesLastPrintTimestamp.labels(username, jobid).set(new Date().getTime());
-  printJobsTotal.labels(username, jobid, success ? "success" : "fail").inc(1);
-  printJobPages.labels(username, jobid).observe(pages);
+  pagesPrintedTotal.labels(username).inc(pages);
+  pagesLastPrintTimestamp.labels(username).set(new Date().getTime());
+  printJobsTotal.labels(username, success ? "success" : "fail").inc(1);
+  printJobPages.labels(username).observe(pages);
 }

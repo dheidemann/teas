@@ -204,7 +204,6 @@ export async function POST(req: Request) {
       recordPrintEvent({
         username: username ?? "",
         pages: (pages ?? 1) * (copies ?? 1),
-        jobid: jobId ?? "",
         success: true,
       });
     }
@@ -228,7 +227,6 @@ export async function POST(req: Request) {
       recordPrintEvent({
         username: username ?? "",
         pages: 0,
-        jobid: "",
         success: false,
       });
     }

@@ -14,7 +14,7 @@
     <a href="https://github.com/dheidemann/teas/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
   </p>
 
-  <img width="621" height="561" alt="image" src="https://github.com/user-attachments/assets/cbba591d-e048-4c8c-8bd1-cbb2e2685249" />
+  <img width="621" height="561" alt="screenshot" src="https://github.com/user-attachments/assets/cbba591d-e048-4c8c-8bd1-cbb2e2685249" />
 </div>
 
 ## Deployment via docker-compose
@@ -29,16 +29,17 @@ services:
 ```
 
 ### Env vars
-| Key | Description | Example |
-| - | - | - |
-| `EXPORT_METRICS` | Enables the `/api/metrics` endpoint. | `true` |
+| Required | Key | Description | Example |
+| - | - | - | - |
+| x | `CUPS_SERVER` | Per default on port `631` | `example.de:631` |
+| | `EXPORT_METRICS` | Enables the `/api/metrics` endpoint. | `true` |
 
 ## Metrics
 When enabled, `teas` exposes metrics regarding the printing activity. To label them by username or similar identifier, the API awaits a `Remote-User` header.
 
 | Name | Type | Description | Labels |
 | - | - | - | - |
-| `pages_printed_total` | Counter | Total number of pages printed by user. | `username`, `jobid` |
-| `pages_last_print_timestamp_seconds` | Gauge | Unix timestamp of last print by user. | `username`, `jobid` |
-| `print_jobs_total` | Counter | Total number of print jobs per user and status. |`username`, `jobid`, `status` |
-| `print_job_pages` | Histogram | Distribution of pages per print job. | `username`, `jobid` |
+| `pages_printed_total` | Counter | Total number of pages printed by user. | `username` |
+| `pages_last_print_timestamp_seconds` | Gauge | Unix timestamp of last print by user. | `username` |
+| `print_jobs_total` | Counter | Total number of print jobs per user and status. |`username`, `status` |
+| `print_job_pages` | Histogram | Distribution of pages per print job. | `username` |
