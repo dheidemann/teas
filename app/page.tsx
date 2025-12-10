@@ -11,6 +11,7 @@ export default function Home() {
   const [color, setColor] = useState("grayscale");
   const [copies, setCopies] = useState(1);
   const [format, setFormat] = useState("a4");
+  const [fitToPage, setFitToPage] = useState(false);
   const [sending, setSending] = useState(false);
   const [log, setLog] = useState("");
 
@@ -36,6 +37,7 @@ export default function Home() {
     fd.append("color", color);
     fd.append("copies", String(copies));
     fd.append("format", format);
+    fd.append("fitToPage", String(fitToPage));
 
     setSending(true);
     setLog("Senden...");
@@ -154,6 +156,17 @@ export default function Home() {
                 <option value="a3">A3</option>
               </select>
             </div>
+          </div>
+
+          <div className="flex flex-row space-x-2">
+            <input
+              type="checkbox"
+              checked={fitToPage}
+              onChange={(e) => setFitToPage(e.target.checked)}
+            />
+            <label className="block text-sm font-medium text-gray-700">
+              Auf Papiergröße skalieren
+            </label>
           </div>
 
           <button

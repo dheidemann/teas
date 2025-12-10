@@ -49,6 +49,8 @@ export async function POST(req: Request) {
     const color = (formData.get("color") as string | null)?.trim() ?? null;
     const copiesStr = (formData.get("copies") as string | null)?.trim() ?? null;
     const format = (formData.get("format") as string | null)?.trim() ?? null;
+    const fitToPage =
+      (formData.get("fitToPage") as string | null)?.trim() ?? null;
 
     if (!file) {
       return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
@@ -160,18 +162,26 @@ export async function POST(req: Request) {
     const args: string[] = [];
     args.push("-d", printer);
     if (typeof copies === "number") args.push("-n", String(copies));
+
     if (duplex && duplex !== "one-sided") {
       args.push("-o", `sides=${duplex}`);
     }
+
     if (color) {
       args.push(
         "-o",
         color === "grayscale" ? "ColorModel=Gray" : "ColorModel=Color"
       );
     }
+
     if (format) {
       args.push("-o", `media=${format}`);
     }
+
+    if (fitToPage === "true") {
+      args.push("-o", "fit-to-page");
+    }
+
     args.push(tempFilePath);
 
     let stdout: string;
