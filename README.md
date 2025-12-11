@@ -32,10 +32,22 @@ services:
 | Required | Key | Description | Example |
 | - | - | - | - |
 | x | `CUPS_SERVER` | Per default on port `631` | `example.de:631` |
-| | `EXPORT_METRICS` | Enables the `/api/metrics` endpoint. | `true` |
+| | `METRICS_API_KEY` | If set enables the `/api/metrics` endpoint | `supersecretapikey` |
 
 ## Metrics
-When enabled, `teas` exposes metrics regarding the printing activity. To label them by username or similar identifier, the API awaits a `Remote-User` header. The project root holds a [Grafana sample dashboard](dashboard.json)
+When enabled, `teas` exposes metrics regarding the printing activity. To label them by username or similar identifier, the API awaits a `Remote-User` header. The project root holds a [Grafana sample dashboard](dashboard.json). The prometheus target should look something like this:
+
+```yaml
+- job_name: teas
+    metrics_path: '/api/metrics'
+    scrape_interval: 5s
+    scheme: 'https'
+    static_configs:
+      - targets: ['print.example.de']
+    authorization:
+      type: Bearer
+      credentials: "YOUR_METRICS_API_KEY_HERE"
+```
 
 | Name | Type | Description | Labels |
 | - | - | - | - |

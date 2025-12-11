@@ -8,7 +8,7 @@ import crypto from "crypto";
 import { recordPrintEvent } from "@/lib/recordPrint";
 import { headers } from "next/headers";
 
-const EXPORT_METRICS = process.env.EXPORT_METRICS === "true";
+const EXPORT_METRICS = !!process.env.METRICS_API_KEY
 const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
 const CHILD_TIMEOUT_MS = 30_000;
 const ALLOWED_DUPLEX = new Set([
