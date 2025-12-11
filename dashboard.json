@@ -28,6 +28,7 @@
           "color": {
             "mode": "thresholds"
           },
+          "decimals": 0,
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -68,7 +69,8 @@
       "pluginVersion": "11.6.0",
       "targets": [
         {
-          "expr": "sum(pages_printed_total)",
+          "expr": "sum(increase(pages_printed_total[$__range]))",
+          "range": true,
           "refId": "A"
         }
       ],
@@ -364,7 +366,6 @@
     }
   ],
   "preload": false,
-  "refresh": "",
   "schemaVersion": 41,
   "tags": [
     "printer"
@@ -395,5 +396,5 @@
   "timezone": "",
   "title": "Printing Portal",
   "uid": "bf6o7mi0mot8gd",
-  "version": 4
+  "version": 5
 }
